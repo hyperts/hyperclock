@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "jsx":"react",
+    "target": "es2015",
+    "module": "commonjs",
+    "rootDir": "./src",
+    "baseUrl": "./src",
+    "typeRoots": ["@types"],
+    "esModuleInterop": true,
+    "outDir": "./dist",
+    "strict": false,
+    "noImplicitAny": false,
+    "skipLibCheck": true
+  }
+}

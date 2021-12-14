@@ -1,0 +1,33 @@
+{
+  "name": "hyperclock",
+  "description": "Displays Clock & Date.",
+  "main": "dist/main.js",
+  "renderer": "dist/render.js",
+  "version": "0.1",
+  "author": "Nodge",
+  "image": "https://i.imgur.com/68oWXYB.png",
+  "hypersettings": {
+    "name": "Hyper Clock",
+    "description": "Control clock display and format settings.",
+    "icon": "Clock",
+    "fields": {
+      "text": {
+        "name": "Time format",
+        "description": "Format used in the entire clock.",
+        "type": "text",
+        "value": "ddd, MMM D  hh:mm A"
+      },
+      "showcallendar": {
+        "name": "Show callendar",
+        "description": "If enabled, clicking on the clock will display a full callendar window.",
+        "type": "checkbox",
+        "value": true
+      }
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^16.11.12",
+    "@types/react": "^17.0.37",
+    "typescript": "^4.5.2"
+  }
+}
