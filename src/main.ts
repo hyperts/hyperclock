@@ -43,8 +43,8 @@ export default function() {
 
       context.api.windows?.hypercalendar.on('blur', () =>{
         setTimeout(()=>{
-          context.api.windows?.hypercalendar?.close()
-          delete context.api.windows?.hypercalendar
+          // context.api.windows?.hypercalendar?.close()
+          // delete context.api.windows?.hypercalendar
         }, 100)
       })
 
@@ -61,6 +61,7 @@ export default function() {
   // @ts-expect-error -- When emmiting, event i not sent
   // arguments becames the first argument from now on.
   context.api.ipcMain.on('sendScreenSize', (size:{w: number, h: number}) => {
+
     //@ts-ignore
     if (!size) { return }
     if (!context.api.windows?.hypercalendar) { return }
