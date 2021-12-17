@@ -1,0 +1,116 @@
+body, html {
+  overflow: hidden;
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.hyperclock.popup {
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--background);
+  color: var(--text);
+  font-weight: normal;
+  user-select: none;
+  padding-top: 12px;
+  position: relative;
+}
+
+#month,#year{
+  display: none;
+}
+
+.container-calendar {
+  padding: 12px;
+  margin: 0 auto;
+  overflow: auto;
+}
+
+#previous {
+  position: absolute;
+  left: 12px;
+  top: 18px;
+  padding: 6px;
+  background-color: var(--secondary) !important;
+  border: none;
+  border-radius: 4px;
+  color: var(--text);
+  transition: all linear;
+  transition-duration: 300ms;
+  cursor: pointer;
+}
+
+#previous:hover {
+  background-color: var(--accent) !important;
+}
+
+#next {
+  position: absolute;
+  right: 12px;
+  top: 18px;
+  padding: 6px;
+  background-color: var(--secondary) !important;
+  border: none;
+  border-radius: 4px;
+  color: var(--text);
+  transition: all linear;
+  transition-duration: 300ms;
+  cursor: pointer;
+}
+
+#next:hover {
+  background-color: var(--accent) !important;
+}
+
+
+.table-calendar {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-calendar tbody:before {
+  content:"-";
+  display:block;
+  line-height:.8em;
+  text-indent:-99999px;
+}
+
+.table-calendar th {
+  border-bottom: solid 1px var(--secondary);
+}
+
+.table-calendar td, .table-calendar th {
+  padding: 5px;
+  text-align: center;
+  vertical-align: top;
+  color: var(--text);
+  font-weight: 300;
+}
+
+.date-picker.selected {
+  font-weight: 600;
+}
+
+.date-picker.selected span {
+  background-color: var(--accent);
+  color: var(--text);
+  border-radius: 50%;
+  padding: 2px 4px;
+}
+
+/* sunday */
+/* .date-picker:nth-child(1) {
+color: red;
+} */
+
+/* friday */
+/* .date-picker:nth-child(6) {
+color: green;
+} */
+
+#monthAndYear {
+  text-align: center;
+  font-weight:400;
+  margin-top: 0;
+}

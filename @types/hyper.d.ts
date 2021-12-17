@@ -121,15 +121,17 @@ type HSWWData = {
   WindowHandle: string // We cast this as string, because node -> win32 FFI is weird.
 }
 
+interface RendererContext {
+  userConfig: Config,
+  api: RendererAPI
+}
+
 interface RendererAPI {
-  config: Config
-  api: {
-    /** 
-     * Electron renderer IPC method
-     * Check https://github.com/hyperts/basewidget for more information about the default hyper events.
-    */
     ipcRenderer: Electron.IpcRenderer
-  }
+}
+
+interface BrowserWindowConstructor {
+  new (options: Electron.BrowserWindowConstructorOptions): Electron.BrowserWindow;
 }
 
 interface MainAPI {
@@ -146,13 +148,13 @@ interface MainAPI {
     /**
       Electron BrowserWindow method
     */
-    browserWindow: Electron.BrowserWindow
+    browserWindow: BrowserWindowConstructor
     /**
      * Array with all windows registered on hyper
      * Every window inside this array is managed by hyper controller
      * When creating a new window, always add it to this array to avoid issues.
     */
-    windows: browserWindow[]
+    windows: { [key:string]: Electron.BrowserWindow }
     /**
      * Electron Menu class
      */
@@ -163,7 +165,7 @@ interface MainAPI {
     shell: Electron.Shell
 }
 
-
+interface MainContext {api: MainAPI, config: Config, directory: string}
 
 
 
@@ -1876,19 +1878,23 @@ Here's a very simple example of creating a custom Jump List:
 
   class BrowserWindow extends NodeEventEmitter {
 
+    /**
+   * BrowserWindow
+     */
+    constructor(options?: BrowserWindowConstructorOptions);
     // Docs: https://electronjs.org/docs/api/browser-window
 
     /**
      * Emitted when the window is set or unset to show always on top of other windows.
      */
     on(event: 'always-on-top-changed', listener: (event: Event,
-      isAlwaysOnTop: boolean) => void): this;
+                                                  isAlwaysOnTop: boolean) => void): this;
     once(event: 'always-on-top-changed', listener: (event: Event,
-      isAlwaysOnTop: boolean) => void): this;
+                                                  isAlwaysOnTop: boolean) => void): this;
     addListener(event: 'always-on-top-changed', listener: (event: Event,
-      isAlwaysOnTop: boolean) => void): this;
+                                                  isAlwaysOnTop: boolean) => void): this;
     removeListener(event: 'always-on-top-changed', listener: (event: Event,
-      isAlwaysOnTop: boolean) => void): this;
+                                                  isAlwaysOnTop: boolean) => void): this;
     /**
      * Emitted when an App Command is invoked. These are typically related to keyboard
      * media keys or browser commands, as well as the "Back" button built into some
@@ -1906,13 +1912,13 @@ Here's a very simple example of creating a custom Jump List:
      * @platform win32,linux
      */
     on(event: 'app-command', listener: (event: Event,
-      command: string) => void): this;
+                                        command: string) => void): this;
     once(event: 'app-command', listener: (event: Event,
-      command: string) => void): this;
+                                        command: string) => void): this;
     addListener(event: 'app-command', listener: (event: Event,
-      command: string) => void): this;
+                                        command: string) => void): this;
     removeListener(event: 'app-command', listener: (event: Event,
-      command: string) => void): this;
+                                        command: string) => void): this;
     /**
      * Emitted when the window loses focus.
      */
@@ -2037,17 +2043,17 @@ __Note__: On macOS this event is an alias of `move`.
      * when title is synthesized from file URL.
      */
     on(event: 'page-title-updated', listener: (event: Event,
-      title: string,
-      explicitSet: boolean) => void): this;
+                                               title: string,
+                                               explicitSet: boolean) => void): this;
     once(event: 'page-title-updated', listener: (event: Event,
-      title: string,
-      explicitSet: boolean) => void): this;
+                                               title: string,
+                                               explicitSet: boolean) => void): this;
     addListener(event: 'page-title-updated', listener: (event: Event,
-      title: string,
-      explicitSet: boolean) => void): this;
+                                               title: string,
+                                               explicitSet: boolean) => void): this;
     removeListener(event: 'page-title-updated', listener: (event: Event,
-      title: string,
-      explicitSet: boolean) => void): this;
+                                               title: string,
+                                               explicitSet: boolean) => void): this;
     /**
      * Emitted when the web page has been rendered (while not being shown) and window
      * can be displayed without a visual flash.
@@ -2104,13 +2110,13 @@ __Note__: On macOS this event is an alias of `move`.
      * @platform darwin
      */
     on(event: 'rotate-gesture', listener: (event: Event,
-      rotation: number) => void): this;
+                                           rotation: number) => void): this;
     once(event: 'rotate-gesture', listener: (event: Event,
-      rotation: number) => void): this;
+                                           rotation: number) => void): this;
     addListener(event: 'rotate-gesture', listener: (event: Event,
-      rotation: number) => void): this;
+                                           rotation: number) => void): this;
     removeListener(event: 'rotate-gesture', listener: (event: Event,
-      rotation: number) => void): this;
+                                           rotation: number) => void): this;
     /**
      * Emitted when scroll wheel event phase has begun.
      *
@@ -2187,13 +2193,13 @@ __Note__: On macOS this event is an alias of `move`.
      * @platform darwin
      */
     on(event: 'swipe', listener: (event: Event,
-      direction: string) => void): this;
+                                  direction: string) => void): this;
     once(event: 'swipe', listener: (event: Event,
-      direction: string) => void): this;
+                                  direction: string) => void): this;
     addListener(event: 'swipe', listener: (event: Event,
-      direction: string) => void): this;
+                                  direction: string) => void): this;
     removeListener(event: 'swipe', listener: (event: Event,
-      direction: string) => void): this;
+                                  direction: string) => void): this;
     /**
      * Emitted when the system context menu is triggered on the window, this is
      * normally only triggered when the user right clicks on the non-client area of
@@ -2205,25 +2211,25 @@ Calling `event.preventDefault()` will prevent the menu from being displayed.
      * @platform win32
      */
     on(event: 'system-context-menu', listener: (event: Event,
-      /**
-       * The screen coordinates the context menu was triggered at
-       */
-      point: Point) => void): this;
+                                                /**
+                                                 * The screen coordinates the context menu was triggered at
+                                                 */
+                                                point: Point) => void): this;
     once(event: 'system-context-menu', listener: (event: Event,
-      /**
-       * The screen coordinates the context menu was triggered at
-       */
-      point: Point) => void): this;
+                                                /**
+                                                 * The screen coordinates the context menu was triggered at
+                                                 */
+                                                point: Point) => void): this;
     addListener(event: 'system-context-menu', listener: (event: Event,
-      /**
-       * The screen coordinates the context menu was triggered at
-       */
-      point: Point) => void): this;
+                                                /**
+                                                 * The screen coordinates the context menu was triggered at
+                                                 */
+                                                point: Point) => void): this;
     removeListener(event: 'system-context-menu', listener: (event: Event,
-      /**
-       * The screen coordinates the context menu was triggered at
-       */
-      point: Point) => void): this;
+                                                /**
+                                                 * The screen coordinates the context menu was triggered at
+                                                 */
+                                                point: Point) => void): this;
     /**
      * Emitted when the window exits from a maximized state.
      */
@@ -2248,25 +2254,25 @@ Calling `event.preventDefault()` will prevent the menu from being displayed.
      * @platform darwin,win32
      */
     on(event: 'will-move', listener: (event: Event,
-      /**
-       * Location the window is being moved to.
-       */
-      newBounds: Rectangle) => void): this;
+                                      /**
+                                       * Location the window is being moved to.
+                                       */
+                                      newBounds: Rectangle) => void): this;
     once(event: 'will-move', listener: (event: Event,
-      /**
-       * Location the window is being moved to.
-       */
-      newBounds: Rectangle) => void): this;
+                                      /**
+                                       * Location the window is being moved to.
+                                       */
+                                      newBounds: Rectangle) => void): this;
     addListener(event: 'will-move', listener: (event: Event,
-      /**
-       * Location the window is being moved to.
-       */
-      newBounds: Rectangle) => void): this;
+                                      /**
+                                       * Location the window is being moved to.
+                                       */
+                                      newBounds: Rectangle) => void): this;
     removeListener(event: 'will-move', listener: (event: Event,
-      /**
-       * Location the window is being moved to.
-       */
-      newBounds: Rectangle) => void): this;
+                                      /**
+                                       * Location the window is being moved to.
+                                       */
+                                      newBounds: Rectangle) => void): this;
     /**
      * Emitted before the window is resized. Calling `event.preventDefault()` will
      * prevent the window from being resized.
@@ -2277,29 +2283,26 @@ Calling `event.preventDefault()` will prevent the menu from being displayed.
      * @platform darwin,win32
      */
     on(event: 'will-resize', listener: (event: Event,
-      /**
-       * Size the window is being resized to.
-       */
-      newBounds: Rectangle) => void): this;
+                                        /**
+                                         * Size the window is being resized to.
+                                         */
+                                        newBounds: Rectangle) => void): this;
     once(event: 'will-resize', listener: (event: Event,
-      /**
-       * Size the window is being resized to.
-       */
-      newBounds: Rectangle) => void): this;
+                                        /**
+                                         * Size the window is being resized to.
+                                         */
+                                        newBounds: Rectangle) => void): this;
     addListener(event: 'will-resize', listener: (event: Event,
-      /**
-       * Size the window is being resized to.
-       */
-      newBounds: Rectangle) => void): this;
+                                        /**
+                                         * Size the window is being resized to.
+                                         */
+                                        newBounds: Rectangle) => void): this;
     removeListener(event: 'will-resize', listener: (event: Event,
-      /**
-       * Size the window is being resized to.
-       */
-      newBounds: Rectangle) => void): this;
-    /**
-     * BrowserWindow
-     */
-    constructor(options?: BrowserWindowConstructorOptions);
+                                        /**
+                                         * Size the window is being resized to.
+                                         */
+                                        newBounds: Rectangle) => void): this;
+
     /**
      * Adds DevTools extension located at `path`, and returns extension's name.
      *
@@ -5132,6 +5135,10 @@ Retrieves the product descriptions.
      * `channel`.
      */
     removeListener(channel: string, listener: (...args: any[]) => void): this;
+    /**
+     * Undocumented - Emits the event, same result as calling from renderer
+     */
+    emit(channel: string, args?: any)
   }
 
   interface IpcMainEvent extends Event {

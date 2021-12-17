@@ -44,7 +44,11 @@ class StateComponent extends react_1.Component {
     }
     render() {
         const showCallendar = this.props.userConfig.getValue('widgets', 'hyper_clock', 'showcallendar');
-        return (react_1.default.createElement("div", { className: "hyperclock wrapper" },
+        return (react_1.default.createElement("div", { className: "hyperclock wrapper", onClick: (e) => {
+                const target = document.querySelector('.hyperclock.wrapper');
+                const bounds = target.getBoundingClientRect();
+                this.props.api.ipcRenderer.send('openHyperCalendar', { x: bounds.x, w: bounds.width });
+            } },
             react_1.default.createElement("p", { className: "time" })));
     }
 }
@@ -52,7 +56,7 @@ class StateComponent extends react_1.Component {
 // React contructor doesn't pass the values, so we call it as a function
 // Check hyper-menu module for a stateless component example
 function default_1() {
-    return react_1.default.createElement(StateComponent, Object.assign({ key: 'hyper-clock', userConfig: this.config, ipcRenderer: this.api.ipcRenderer }, this.props));
+    return react_1.default.createElement(StateComponent, Object.assign({ key: 'hyper-clock', userConfig: this.config, api: this.api }, this.props));
 }
 exports.default = default_1;
 exports.styles = ['styles/index.css'];

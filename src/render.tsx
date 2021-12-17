@@ -1,20 +1,17 @@
+import {RendererContext} from '../@types/hyper'
 import React, {Component} from '../../../modules/react';
 import dayjs from '../modules/dayjs'
 
-interface Props {
-  userConfig: any,
-  ipcRenderer: any
-}
 
-class StateComponent extends Component<Props> {
-  props: any;
+class StateComponent extends Component<RendererContext> {
+  props: RendererContext;
 
   constructor(props) {
     super(props)
   }
 
   startClock() {
-    const timeFormat = this.props.userConfig.getValue('widgets', 'hyper_clock', 'text')
+    const timeFormat = this.props.userConfig.getValue('widgets', 'hyper_clock', 'text') as string
     const timeContainer = document.querySelector('.hyperclock.wrapper .time')
     timeContainer.textContent = dayjs().format(timeFormat)
     setTimeout(()=>{
@@ -31,9 +28,16 @@ class StateComponent extends Component<Props> {
   render() {
 
     const showCallendar = this.props.userConfig.getValue('widgets', 'hyper_clock', 'showcallendar')
-   
+
     return (
-      <div className="hyperclock wrapper">
+      <div 
+      className="hyperclock wrapper"
+      onClick={(e)=>{
+        const target = document.querySelector('.hyperclock.wrapper')
+        const bounds = target.getBoundingClientRect()
+        this.props.api.ipcRenderer.send('openHyperCalendar', {x: bounds.x, w: bounds.width})
+      }}
+      >
         <p className="time"></p>
       </div>
     );
@@ -48,7 +52,7 @@ export default function() {
   return <StateComponent
     key={'hyper-clock'} 
     userConfig={this.config} 
-    ipcRenderer={this.api.ipcRenderer} 
+    api={this.api}
     {...this.props}
   />
 }
