@@ -88,6 +88,10 @@ body, html {
   font-weight: 300;
 }
 
+.table-calendar tr {
+  line-height: 2em
+}
+
 .date-picker.selected {
   font-weight: 600;
 }
