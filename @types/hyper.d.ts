@@ -1,6 +1,39 @@
 
 type GlobalEvent = Event & { returnValue: any };
 
+interface Logger {
+  /**
+   * Prints a logging message on hyper console
+   * Debug console must be enabled in settings.
+   */
+  public info: (...args: any[])=> void
+  /**
+   * Prints a logging message on hyper console
+   * Debug console must be enabled in settings.
+   */
+  public warn: (...args: any[])=> void
+  /**
+   * Prints a logging message on hyper console
+   * Debug console must be enabled in settings.
+   */
+  public error: (...args: any[])=> void
+  /**
+   * Prints a logging message on hyper console
+   * Debug console must be enabled in settings.
+   */
+  public silly: (...args: any[])=> void
+  /**
+   * Prints a logging message on hyper console
+   * Debug console must be enabled in settings.
+   */
+  public debug: (...args: any[])=> void
+  /**
+   * Prints a logging message on hyper console
+   * Debug console must be enabled in settings.
+   */
+  public success: (...args: any[])=> void
+}
+
 interface Config {
   /**
  * Returns data using any object path
